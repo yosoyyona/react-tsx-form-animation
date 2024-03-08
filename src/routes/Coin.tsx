@@ -125,32 +125,20 @@ interface PriceData {
   };
 }
 
-
 function Coin() {
   const { coinId } = useParams<RouteParams>();
   const { state } = useLocation<RouteState>();
   const priceMatch = useRouteMatch("/:coinId/price");
   const chartMatch = useRouteMatch("/:coinId/chart");
-  const { isLoading: infoLoading, data: infoData } = useQuery<InfoData>(["info", coinId], () => fetchCoinInfo(coinId));
-  const { isLoading: tickersLoading, data: tickersData } = useQuery<PriceData>(["tickers", coinId], () => fetchCoinTickers(coinId));
-  /* const [loading, setLoading] = useState(true);
-  const [info, setInfo] = useState<InfoData>();
-  const [priceInfo, setPriceInfo] = useState<PriceData>();
-
-  useEffect(() => {
-    (async() => {
-      const infoData = await ( 
-        await fetch(`https://api.coinpaprika.com/v1/coins/${coinId}`)
-      ).json();
-      const priceData = await (
-        await fetch(`https://api.coinpaprika.com/v1/tickers/${coinId}`)
-      ).json();
-      setInfo(infoData);
-      setPriceInfo(priceData);
-      setLoading(false);
-    })();
-  }, [coinId]) */
-
+  // because of there is 2 useQuery, rename isLoading to inforLoading/tickersLoading, 
+  // 2 datas to infoData/tickersData
+  // and for 2 keys, give unique id-> make it array and arrow functions
+  const { isLoading: infoLoading, data: infoData } = useQuery<InfoData>(
+    ["info", coinId], () => fetchCoinInfo(coinId)
+  );
+  const { isLoading: tickersLoading, data: tickersData } = useQuery<PriceData>(
+    ["tickers", coinId], () => fetchCoinTickers(coinId)
+  );
   const loading = infoLoading || tickersLoading;
 
   return (
@@ -213,4 +201,3 @@ function Coin() {
   );
 }
 export default Coin;
-
