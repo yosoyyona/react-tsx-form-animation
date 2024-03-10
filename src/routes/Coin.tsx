@@ -125,19 +125,23 @@ interface PriceData {
   };
 }
 
-function Coin() {
+interface ICoinProps {
+  isDark: boolean;
+}
+
+function Coin({ isDark }: ICoinProps) {
   const { coinId } = useParams<RouteParams>();
   const { state } = useLocation<RouteState>();
   const priceMatch = useRouteMatch("/:coinId/price");
   const chartMatch = useRouteMatch("/:coinId/chart");
-  // because of there is 2 useQuery, rename isLoading to inforLoading/tickersLoading, 
-  // 2 datas to infoData/tickersData
-  // and for 2 keys, give unique id-> make it array and arrow functions
   const { isLoading: infoLoading, data: infoData } = useQuery<InfoData>(
     ["info", coinId], () => fetchCoinInfo(coinId)
   );
   const { isLoading: tickersLoading, data: tickersData } = useQuery<PriceData>(
-    ["tickers", coinId], () => fetchCoinTickers(coinId)
+    ["tickers", coinId], () => fetchCoinTickers(coinId),
+    {
+      refetchInterval: 5000,
+    }
   );
   const loading = infoLoading || tickersLoading;
 
@@ -160,10 +164,6 @@ function Coin() {
             <OverviewItem>
               <span>Symbol:</span>
               <span>${infoData?.symbol}</span>
-            </OverviewItem>
-            <OverviewItem>
-              <span>Open Source:</span>
-              <span>{infoData?.open_source ? "Yes" : "No"}</span>
             </OverviewItem>
           </Overview>
           <Description>{infoData?.description}</Description>
@@ -192,7 +192,7 @@ function Coin() {
               <Price />
             </Route>
             <Route path={`/:coinId/chart`}>
-              <Chart />
+              <Chart isDark={isDark} />
             </Route>
           </Switch>
         </>

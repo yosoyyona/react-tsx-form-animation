@@ -1,4 +1,8 @@
-function Chart() {
+interface ChartProps {
+  isDark: boolean;
+}
+
+function Chart({ isDark }: ChartProps) {
   return <h1>Chart</h1>
 }
 
