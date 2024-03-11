@@ -35,16 +35,24 @@ interface IForm {
   username: string;
   password: string;
   passwordConfirmation: string;
+  extraError?: string;
 }
 
 function ToDoList() {
-  const { register, handleSubmit, formState: {errors} } = useForm<IForm>({
+  const { register, handleSubmit, formState: {errors}, setError } = useForm<IForm>({
     defaultValues: {
       email: "@naver.com",
     }
   }); 
-  const onValid = (data:any) => {
-    console.log(data);
+  const onValid = (data:IForm) => {
+    if(data.password !== data.passwordConfirmation) {
+      setError(
+        "passwordConfirmation", 
+        {message: "Password are not the same"}, 
+        {shouldFocus: true}
+      );
+    }
+    // setError("extraError", { message: "Server offline."});
   };
   console.log(errors)
   return (
@@ -58,18 +66,33 @@ function ToDoList() {
           } 
         })} placeholder="Email" />
         <span>{errors?.email?.message as string}</span>
-        <input {...register("firstName", { required: true })} placeholder="First Name" />
+        <input {...register("firstName", { 
+          required: "fill this field", 
+          validate: {
+            noYona: (value) => value.includes("yona") ? "No yona allowed" : true, 
+            noJesus: (value) => value.includes("jesus") ? "No jesus allowed" : true, 
+          }
+          })} 
+          placeholder="First Name" 
+        />
+        <span>{errors?.firstName?.message as string}</span>
         <input {...register("lastName")} placeholder="Last Name" />
+        <span>{errors?.lastName?.message as string}</span>
         <input {...register("username", { 
           required: "Username is required", 
           minLength: {
             value: 10,
             message: "Username has to be more than 10 letters." 
-          } 
-        })} placeholder="Username" />
+          }})} 
+          placeholder="Username" 
+        />
+        <span>{errors?.username?.message as string}</span>
         <input {...register("password", { required: true })} placeholder="Password" />
+        <span>{errors?.password?.message as string}</span>
         <input {...register("passwordConfirmation", { required: true })} placeholder="Password confirmation" />
+        <span>{errors?.passwordConfirmation?.message as string}</span>
         <button>Add</button>
+        <span>{errors?.extraError?.message as string}</span>
       </form>
     </div>
   );
