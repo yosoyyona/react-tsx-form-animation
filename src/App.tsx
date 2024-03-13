@@ -1,6 +1,6 @@
 import styled from "styled-components";
-import { motion } from "framer-motion"
-import { useRef } from "react";
+import { motion, useMotionValue } from "framer-motion"
+import { useEffect } from "react";
 
 const Wrapper = styled.div`
   display: flex;
@@ -8,17 +8,6 @@ const Wrapper = styled.div`
   width: 100vw;
   justify-content: center;
   align-items: center;
-`;
-
-const BiggerBox = styled(motion.div)`
-  width: 600px;
-  height: 600px;
-  background-color: rgba(255, 255, 255, 0.4);
-  border-radius: 40px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
 `;
 
 const Box = styled(motion.div)`
@@ -37,21 +26,19 @@ const boxVars = {
 };
 
 function App() {
-  const biggerBoxRef = useRef<HTMLDivElement>(null); // create reference
+  const x = useMotionValue(0); // by default it's 0
+  console.log(x); //console.log just happens once.
+  useEffect(() => {
+    x.onChange(() => console.log(x.get())) // to get the value
+  }, [x]);
   return (
     <Wrapper>
-      <BiggerBox ref={biggerBoxRef}>
-        <Box 
-          drag
-          dragSnapToOrigin
-          dragElastic={0.5} // between 0 and 1: 0-stay in the BiggerBox, 1-move with mouse
-          dragConstraints={biggerBoxRef} 
-          variants={boxVars}
-          whileDrag="drag"
-          whileHover="hover"
-          whileTap="click"
-        />
-      </BiggerBox>
+      <button onClick={() => x.set(200)}>click me</button> <span>to set the location</span> 
+      <Box 
+        style={{x}} // = {{x: x}}
+        drag="x"
+        dragSnapToOrigin
+      />
     </Wrapper>
   );
 }
